@@ -33,7 +33,11 @@ snp <- read.csv("snp_position.txt", sep="\t")
 # Dim returns number of rows, then number of columns.
 dim(fang)
 dim(snp)
+# Size of files makes str() a bit unwieldly, and our fang object is a bit too much for just looking at the header.  Cutting it down a bit on rows and columns helps some, though, and still gives us a decent general idea.  
+fang[1:5,1:5]
+snp[1:5,1:5]
 ```
+Thus, we see that the filesize for fang_et_al_genotypes.txt is 11054722 bytes, with 2782 rows and 986 columns.  snp_position.txt is 83747 bytes, with 983 rows and 15 columns.
 
 ## Data Processing
 
