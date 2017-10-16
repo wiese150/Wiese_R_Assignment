@@ -2,23 +2,11 @@
 title: "R Assignment Notebook"
 output: html_notebook
 ---
-## Leaving the lot of extra information here, for now, just for my own notes.  I'll remove it once I'm done.
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
-```{r}
-plot(cars)
-```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
 # R Assignment Wiese
 
-Inspection, processing, and visualization of data from a paper.
+Inspection, processing, and visualization of data from a paper.  Worth noting, before I start this, that I had a few difficulties even getting R markdown to work properly on my computer.  Had to redownload R and reinstall Rcpp again to get it functioning.
+
 
 ## Data Inspection
 1. Initial step is simply copying the necessary files (fang_et_al_genotypes.txt and snp_position.txt) to the repository for this project.
@@ -37,9 +25,23 @@ dim(snp)
 fang[1:5,1:5]
 snp[1:5,1:5]
 ```
-Thus, we see that the filesize for fang_et_al_genotypes.txt is 11054722 bytes, with 2782 rows and 986 columns.  snp_position.txt is 83747 bytes, with 983 rows and 15 columns.
+We see that the filesize for fang_et_al_genotypes.txt is 11054722 bytes, with 2782 rows and 986 columns.  snp_position.txt is 83747 bytes, with 983 rows and 15 columns.
 
 ## Data Processing
+Data examined, we are now ready to process it for analysis.
 
+1.  First step is to create distinct maize (ZMMIL, ZMMLR, and ZMMMR) and teosinate (ZMPBA, ZMPIL, and ZMPJA) genotype objects.  Can then transpose them for use when merging.
+
+```{r}
+m_geno <- subset(fang, Group == "ZMMIL" | Group == "ZMMLR" | Group == "ZMMMR")
+t_geno <- subset(fang, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+trans_m_geno <- t(m_geno)
+trans_t_geno <- t(t_geno)
+# Actually almost forgot this, am kinda glad I went back and checked.  The transposed genotype files apparently aren't treated as data frames, so.
+trans_m_geno <- as.data.frame(trans_m_geno)
+trans_t_geno <- as.data.frame(trans_t_geno)
+# This last bit is just to show it worked, basically.  Not really the best method for doing so, but it's the one I like to use.  Tend to observe different rows/columns this way before calling it good.
+trans_m_geno[1:5,1:5]
+```
 
 ## Data Visualization
