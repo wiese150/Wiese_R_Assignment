@@ -1,7 +1,8 @@
 ---
-title: "R Notebook"
+title: "R Assignment Notebook"
 output: html_notebook
 ---
+# Leaving the lot of extra information here, for now, just for my own notes.  I'll remove it once I'm done.
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
