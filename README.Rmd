@@ -18,8 +18,10 @@ When you save the notebook, an HTML file containing the code and output will be 
 
 # R Assignment Wiese
 
+Inspection, processing, and visualization of data from a paper.
 
 ## Data Inspection
+1. Initial step is simply copying the necessary files (fang_et_al_genotypes.txt and snp_position.txt) to the repository for this project.
 
 
 ## Data Processing
