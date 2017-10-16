@@ -22,11 +22,14 @@ Inspection, processing, and visualization of data from a paper.
 
 ## Data Inspection
 1. Initial step is simply copying the necessary files (fang_et_al_genotypes.txt and snp_position.txt) to the repository for this project.
-2. Second part is just translating the files into objects for R.  Pretty easy to do.
+2. Second part is just translating the files into objects for R.  Pretty easy to do.  Can then look at stuff like number of rows and columns.
 
 ```{r}
 fang <- read.csv("fang_et_al_genotypes.txt", sep="\t")
 snp <- read.csv("snp_position.txt", sep="\t")
+# Dim returns number of rows, then number of columns.
+dim(fang)
+dim(snp)
 ```
 
 ## Data Processing
