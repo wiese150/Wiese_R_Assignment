@@ -90,12 +90,31 @@ merged_maize_geno <- merged_maize_geno[order(merged_maize_geno$Position),]
 merged_teosinte_geno <- merged_teosinte_geno[order(merged_teosinte_geno$Position),]
 # After that, we can do the for loop.  I initially attempted to use write.csv for this, but apparently the separator is hardcoded and I had some issues.  Ended up having to use write.table instead.
 for (i in 1:10) {
-  assign(paste("m_chr_", i), subset(merged_maize_geno, Chromosome == i))
-  write.table(x = get(paste("m_chr_", i)), file = paste("maize_chromosome_", i, ".txt"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+  assign(paste("m_chr_", i, sep=""), subset(merged_maize_geno, Chromosome == i))
+  write.table(x = get(paste("m_chr_", i, sep="")), file = paste("maize_chromosome_", i, ".txt", sep=""), quote = FALSE, sep = "\t")
 }
 for (i in 1:10) {
-  assign(paste("t_chr_", i), subset(merged_teosinte_geno, Chromosome == i))
-  write.table(x = get(paste("t_chr_", i)), file = paste("teosinte_chromosome_", i, ".txt"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+  assign(paste("t_chr_", i, sep=""), subset(merged_teosinte_geno, Chromosome == i))
+  write.table(x = get(paste("t_chr_", i, sep="")), file = paste("teosinte_chromosome_", i, ".txt", sep=""), quote = FALSE, sep = "\t")
+}
+```
+
+4.  For this part, it's the same basic idea.  However, we're going to have to reverse the order and add another part to the loop in order to swap out the ? character.  gsub can be used for this.
+
+```{r}
+
+merged_maize_geno_r <- merged_maize_geno[rev(order(merged_maize_geno$Position)),]
+merged_teosinte_geno_r <- merged_teosinte_geno[rev(order(merged_teosinte_geno$Position)),]
+
+for (i in 1:10) {
+  assign(paste("m_chr_", i, "_r", sep=""), subset(merged_maize_geno_r, Chromosome == i))
+  assign(paste("m_chr_", i, "_r", sep=""), data.frame(lapply(get(paste("m_chr_", i, "_r", sep="")), function(x) {gsub(pattern = "\\?", replacement = "-", x)})))
+  write.table(x = get(paste("m_chr_", i, "_r", sep="")), file = paste("maize_chromosome_", i, "_reverse.txt", sep=""), quote = FALSE, sep = "\t")
+}
+for (i in 1:10) {
+  assign(paste("t_chr_", i, "_r", sep=""), subset(merged_teosinte_geno, Chromosome == i))
+  assign(paste("t_chr_", i, "_r", sep=""), data.frame(lapply(get(paste("t_chr_", i, "_r", sep="")), function(x) {gsub(pattern = "\\?", replacement = "-", x)})))
+  write.table(x = get(paste("t_chr_", i, "_r", sep="")), file = paste("teosinte_chromosome_", i, "_reverse.txt", sep=""), quote = FALSE, sep = "\t")
 }
 ```
 ## Data Visualization
