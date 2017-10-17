@@ -72,4 +72,30 @@ r_snp <- r_snp[order(r_snp$SNP_ID),]
 colnames(r_snp)
 r_snp[1:3,1:3]
 ```
+2.  With all that done, we can now merge the two datasets.  The merge command will suffice for this.
+
+```{r}
+merged_maize_geno <- merge(r_snp, trans_m_geno, by = "SNP_ID")
+merged_teosinte_geno <- merge(r_snp, trans_t_geno, by = "SNP_ID")
+dim(merged_maize_geno)
+dim(merged_teosinte_geno)
+merged_maize_geno[1:4,1:4]
+```
+
+3.  Now that the data is merged, the next set involves the extraction of data for specific chromosomes to separate files, ordered based on increasing position.  This is somewhat tedious to do manually, so we shall utilize a for loop to do it for us.
+
+```{r}
+# First step is ordering the files.
+merged_maize_geno <- merged_maize_geno[order(merged_maize_geno$Position),]
+merged_teosinte_geno <- merged_teosinte_geno[order(merged_teosinte_geno$Position),]
+# After that, we can do the for loop.  I initially attempted to use write.csv for this, but apparently the separator is hardcoded and I had some issues.  Ended up having to use write.table instead.
+for (i in 1:10) {
+  assign(paste("m_chr_", i), subset(merged_maize_geno, Chromosome == i))
+  write.table(x = get(paste("m_chr_", i)), file = paste("maize_chromosome_", i, ".txt"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+}
+for (i in 1:10) {
+  assign(paste("t_chr_", i), subset(merged_teosinte_geno, Chromosome == i))
+  write.table(x = get(paste("t_chr_", i)), file = paste("teosinte_chromosome_", i, ".txt"), quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+}
+```
 ## Data Visualization
