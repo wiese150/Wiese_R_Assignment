@@ -151,3 +151,4 @@ With that done, we can now actually plot the number of SNPs per chromosome, like
 ggplot(snpmaize) + geom_point(aes(x=chr, y=snps))
 ggplot(snpteosinte) + geom_point(aes(x=chr, y=snps))
 ```
+At this point, it strikes me that this was not the way I was intended to go about doing this, but it technically works for what they asked for so I'm not going to bother fixing it now.
