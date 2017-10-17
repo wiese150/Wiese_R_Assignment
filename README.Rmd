@@ -117,4 +117,32 @@ for (i in 1:10) {
   write.table(x = get(paste("t_chr_", i, "_r", sep="")), file = paste("teosinte_chromosome_", i, "_reverse.txt", sep=""), quote = FALSE, sep = "\t")
 }
 ```
+And that is that for all the old work.
+
 ## Data Visualization
+
+1.  Now, we're getting into the new stuff: Visualization of the data.  The first thing to do is just to make sure ggplot is up and running.
+
+```{r}
+if (!require("ggplot2")) install.packages("ggplot2")
+library(ggplot2)
+```
+
+2.  For the total SNPs on each chromosome, we're going to want the number of rows in each of the relevant files plotted against the file number.  To plot this, we can create a new data frame with another for loop.
+
+```{r}
+snpmaize = data.frame("chr" = integer(), "snps" = integer())
+snpteosinte = data.frame("chr" = integer(), "snps" = integer())
+for (i in 1:10) {
+  snpmaize <- rbind(snpmaize, c(i, nrow(get(paste("m_chr_", i, "_r", sep="")))))
+}
+# For some reason, the names are disappearing after I use rbind, so I had to add the colnames bit again.
+colnames(snpmaize) <- c("chr", "snps")
+for (i in 1:10) {
+  snpteosinte <- rbind(snpteosinte, c(i, nrow(get(paste("t_chr_", i, "_r", sep="")))))
+}
+colnames(snpteosinte) <- c("chr", "snps")
+snpmaize
+snpteosinte
+# It isn't really necessary to do this with both maize and teosinte, but it helps to show everything's working.
+```
