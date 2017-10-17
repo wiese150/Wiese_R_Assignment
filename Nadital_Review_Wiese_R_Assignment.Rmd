@@ -1,0 +1,32 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Nadital Review of Wiese R Assignment
+
+## General Review
+
+Good use of "#" to describe step wise process, for noting how and why each step was taken.
+
+I would have added more information in the data inspection. Use of the list(), class(), typeof() or ncol() would provide more information. In particular, list and class are important for data manipulation.
+
+Good use of dim() as a check function throughout project
+
+Would have been nice to have the files sorted in a directory, but unnecessary.
+
+## Specific Review
+
+The dim() function was an appropriate choice for file investigation due to size limitations.
+
+Excellent use of the for loop. I attempted a similar thing and failed so this was nice to see that it was doable.
+
+I was a little unclear as to what the scripits were coding for the data visualizations. I'm not sure that a for loop is really appropriate here.
+
+For some reason I couldn't see the plots. I think it's because ggplot2 does not automatically create images that can be saved. However, the script for the plot generation looks correct. 
+
+Missing the individual visualization. 
+
+## Overall Review
+
+Overall, file generation was done correctly, and with some nice coding. Could use some work on file inspection and visualizations were not viewable on my end. However, some of the visualization script was correct. I'd say overall, a decent job. 
