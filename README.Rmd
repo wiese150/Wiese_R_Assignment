@@ -146,3 +146,8 @@ snpmaize
 snpteosinte
 # It isn't really necessary to do this with both maize and teosinte, but it helps to show everything's working.
 ```
+With that done, we can now actually plot the number of SNPs per chromosome, like so.
+```{r}
+ggplot(snpmaize) + geom_point(aes(x=chr, y=snps))
+ggplot(snpteosinte) + geom_point(aes(x=chr, y=snps))
+```
