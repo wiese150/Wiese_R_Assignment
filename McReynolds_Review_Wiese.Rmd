@@ -2,7 +2,15 @@
 title: "R Assignment Notebook"
 output: html_notebook
 ---
-
+---
+Comments from Max McReynolds (reviewer)
+1. You did a good job analyzing inspecting the data set.  Getting an idea of the file sizes is always a good thing to check.  
+2. Your data manipulation steps were also well done.  The use of the for loops to condense your code size down and make it manageable and tidy was good thinking.  Everything closely mimic'd what we did for the unix assignment
+3. For data visualization you did a different approach than what was mentioned in the assignment details (tidy) and (melt) etc. but it seems you got it to work out just fine and produced a graph as required by the assignment
+4. The x and y axis for the graph were an odd set of values to display (0, 2.5, 5, 7.5, 10) but I was still able to easily look at it and discern what snp amount corresponded to which chromosome.
+5. Did not do the remaining part of the assignment.
+6. Overall nicely done with the parts that he finished.  
+---
 # R Assignment Wiese
 
 Inspection, processing, and visualization of data from a paper.  Worth noting, before I start this, that I had a few difficulties even getting R markdown to work properly on my computer.  Had to redownload R and reinstall Rcpp again to get it functioning.
