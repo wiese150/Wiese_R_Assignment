@@ -1,0 +1,154 @@
+---
+title: "R Assignment Notebook"
+output: html_notebook
+---
+
+# R Assignment Wiese
+
+Inspection, processing, and visualization of data from a paper.  Worth noting, before I start this, that I had a few difficulties even getting R markdown to work properly on my computer.  Had to redownload R and reinstall Rcpp again to get it functioning.
+
+
+## Data Inspection
+1. Initial step is simply copying the necessary files (fang_et_al_genotypes.txt and snp_position.txt) to the repository for this project.
+2. Second part is just translating the files into objects for R after getting basic file info.  Pretty easy to do.  Can then look at stuff like number of rows and columns.
+
+```{r}
+# Utility functions exist to check file size.
+file.size("fang_et_al_genotypes.txt")
+file.size("snp_position.txt")
+fang <- read.csv("fang_et_al_genotypes.txt", sep="\t")
+snp <- read.csv("snp_position.txt", sep="\t")
+# Dim returns number of rows, then number of columns.
+dim(fang)
+dim(snp)
+# Size of files makes str() a bit unwieldly, and our fang object is a bit too much for just looking at the header.  Cutting it down a bit on rows and columns helps some, though, and still gives us a decent general idea.  
+fang[1:5,1:5]
+snp[1:5,1:5]
+```
+We see that the filesize for fang_et_al_genotypes.txt is 11054722 bytes, with 2782 rows and 986 columns.  snp_position.txt is 83747 bytes, with 983 rows and 15 columns.
+
+## Data Processing
+Data examined, we are now ready to process it for analysis.
+
+1.  Both file objects must be modified in preparation for merging.  The first step is to create distinct maize (ZMMIL, ZMMLR, and ZMMMR) and teosinate (ZMPBA, ZMPIL, and ZMPJA) genotype objects.  Can then transpose them for use when merging.
+
+```{r}
+m_geno <- subset(fang, Group == "ZMMIL" | Group == "ZMMLR" | Group == "ZMMMR")
+t_geno <- subset(fang, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+trans_m_geno <- t(m_geno)
+trans_t_geno <- t(t_geno)
+# Actually almost forgot this, am kinda glad I went back and checked.  The transposed genotype files apparently aren't treated as data frames, so.
+trans_m_geno <- as.data.frame(trans_m_geno)
+trans_t_geno <- as.data.frame(trans_t_geno)
+# This last bit is just to show it worked, basically.  Not really the best method for doing so, but it's the one I like to use.  Tend to observe different rows/columns this way before calling it good.
+trans_m_geno[1:5,1:5]
+```
+Bit of an aside, but an upshot of this method versus the method we used with git--at least, the way I did it--is the creation of far fewer intermediate files to flood the repository.
+
+Now we need to remove the first three rows of the transposed data in order to get it into a state for merging.  Will also need to create a new column named SNP_ID, with the current row names as the values, to be used as a common column (I'd gotten a little confused over this for a bit and thought I could use the row names directly as a column, but I couldn't get it to work properly).  Sort to finish up this bit of prep.
+
+```{r}
+trans_m_geno <- trans_m_geno[-c(1:3),]
+trans_t_geno <- trans_t_geno[-c(1:3),]
+trans_m_geno$SNP_ID <- rownames(trans_m_geno)
+trans_t_geno$SNP_ID <- rownames(trans_t_geno)
+trans_m_geno <- trans_m_geno[order(trans_m_geno$SNP_ID),]
+trans_t_geno <- trans_t_geno[order(trans_t_geno$SNP_ID),]
+trans_m_geno[1:5,1:5]
+```
+
+Now it's necessary to prepare the snp object for merging.  Unlike in the pure git method we used before, we don't actually need to remove the header for this:  The column names are just column names, and are actually key to merging, as alluded above.  We need to check which columns are the ones we need, first.
+
+```{r}
+colnames(snp)
+typeof(snp[4,4])
+```
+
+As we can see that we need the first, third, and fourth columns, we can then call on those and throw them into a new object, then sort them.
+
+```{r}
+r_snp <- snp[,c(1,3,4)]
+r_snp <- r_snp[order(r_snp$SNP_ID),]
+colnames(r_snp)
+r_snp[1:3,1:3]
+```
+2.  With all that done, we can now merge the two datasets.  The merge command will suffice for this.
+
+```{r}
+merged_maize_geno <- merge(r_snp, trans_m_geno, by = "SNP_ID")
+merged_teosinte_geno <- merge(r_snp, trans_t_geno, by = "SNP_ID")
+dim(merged_maize_geno)
+dim(merged_teosinte_geno)
+merged_maize_geno[1:4,1:4]
+```
+
+3.  Now that the data is merged, the next set involves the extraction of data for specific chromosomes to separate files, ordered based on increasing position.  This is somewhat tedious to do manually, so we shall utilize a for loop to do it for us.
+
+```{r}
+# First step is ordering the files.
+merged_maize_geno <- merged_maize_geno[order(merged_maize_geno$Position),]
+merged_teosinte_geno <- merged_teosinte_geno[order(merged_teosinte_geno$Position),]
+# After that, we can do the for loop.  I initially attempted to use write.csv for this, but apparently the separator is hardcoded and I had some issues.  Ended up having to use write.table instead.
+for (i in 1:10) {
+  assign(paste("m_chr_", i, sep=""), subset(merged_maize_geno, Chromosome == i))
+  write.table(x = get(paste("m_chr_", i, sep="")), file = paste("maize_chromosome_", i, ".txt", sep=""), quote = FALSE, sep = "\t")
+}
+for (i in 1:10) {
+  assign(paste("t_chr_", i, sep=""), subset(merged_teosinte_geno, Chromosome == i))
+  write.table(x = get(paste("t_chr_", i, sep="")), file = paste("teosinte_chromosome_", i, ".txt", sep=""), quote = FALSE, sep = "\t")
+}
+```
+
+4.  For this part, it's the same basic idea.  However, we're going to have to reverse the order and add another part to the loop in order to swap out the ? character.  gsub can be used for this.
+
+```{r}
+
+merged_maize_geno_r <- merged_maize_geno[rev(order(merged_maize_geno$Position)),]
+merged_teosinte_geno_r <- merged_teosinte_geno[rev(order(merged_teosinte_geno$Position)),]
+
+for (i in 1:10) {
+  assign(paste("m_chr_", i, "_r", sep=""), subset(merged_maize_geno_r, Chromosome == i))
+  assign(paste("m_chr_", i, "_r", sep=""), data.frame(lapply(get(paste("m_chr_", i, "_r", sep="")), function(x) {gsub(pattern = "\\?", replacement = "-", x)})))
+  write.table(x = get(paste("m_chr_", i, "_r", sep="")), file = paste("maize_chromosome_", i, "_reverse.txt", sep=""), quote = FALSE, sep = "\t")
+}
+for (i in 1:10) {
+  assign(paste("t_chr_", i, "_r", sep=""), subset(merged_teosinte_geno, Chromosome == i))
+  assign(paste("t_chr_", i, "_r", sep=""), data.frame(lapply(get(paste("t_chr_", i, "_r", sep="")), function(x) {gsub(pattern = "\\?", replacement = "-", x)})))
+  write.table(x = get(paste("t_chr_", i, "_r", sep="")), file = paste("teosinte_chromosome_", i, "_reverse.txt", sep=""), quote = FALSE, sep = "\t")
+}
+```
+And that is that for all the old work.
+
+## Data Visualization
+
+1.  Now, we're getting into the new stuff: Visualization of the data.  The first thing to do is just to make sure ggplot is up and running.
+
+```{r}
+if (!require("ggplot2")) install.packages("ggplot2")
+library(ggplot2)
+```
+
+2.  For the total SNPs on each chromosome, we're going to want the number of rows in each of the relevant files plotted against the file number.  To plot this, we can create a new data frame with another for loop.
+
+```{r}
+snpmaize = data.frame("chr" = integer(), "snps" = integer())
+snpteosinte = data.frame("chr" = integer(), "snps" = integer())
+for (i in 1:10) {
+  snpmaize <- rbind(snpmaize, c(i, nrow(get(paste("m_chr_", i, "_r", sep="")))))
+}
+# For some reason, the names are disappearing after I use rbind, so I had to add the colnames bit again.
+colnames(snpmaize) <- c("chr", "snps")
+for (i in 1:10) {
+  snpteosinte <- rbind(snpteosinte, c(i, nrow(get(paste("t_chr_", i, "_r", sep="")))))
+}
+colnames(snpteosinte) <- c("chr", "snps")
+snpmaize
+snpteosinte
+# It isn't really necessary to do this with both maize and teosinte, but it helps to show everything's working.
+```
+With that done, we can now actually plot the number of SNPs per chromosome, like so.
+```{r}
+ggplot(snpmaize) + geom_point(aes(x=chr, y=snps))
+ggplot(snpteosinte) + geom_point(aes(x=chr, y=snps))
+```
+At this point, it strikes me that this was not the way I was intended to go about doing this, but it technically works for what they asked for so I'm not going to bother fixing it now.
